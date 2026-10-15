@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Copilot | Your Future Starts Here</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <h2 class="logo">🚀 Career Copilot</h2>
+        <p class="menu-label">WORKSPACE</p>
+        <nav>
+            <a href="#dashboard" class="nav-link active">🏠 Dashboard</a>
+            <a href="#profile" class="nav-link">👤 My Profile</a>
+            <a href="#skills" class="nav-link">🧠 Skill Analysis</a>
+            <a href="#roadmap" class="nav-link">🗺️ Career Roadmap</a>
+            <a href="#internships" class="nav-link">💼 Internships</a>
+        </nav>
+        <div class="sidebar-bottom">
+            <p>Learn. Build. Grow.</p>
+            <small>Your career journey starts here.</small>
+        </div>
+    </aside>
+
+    <main class="main-content" id="dashboard">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">YOUR PERSONAL CAREER ASSISTANT</p>
+                <h1>Dashboard</h1>
+            </div>
+            <div class="profile-badge">S</div>
+        </header>
+
+        <section class="hero">
+            <div>
+                <p class="eyebrow hero-eyebrow">YOUR FUTURE, YOUR PLAN</p>
+                <h2>Build a career<br>you're proud of.</h2>
+                <p>Understand your skills, plan your learning, and stay on top of your internship applications.</p>
+                <a href="#profile" class="primary-button">Set Up My Profile →</a>
+            </div>
+            <div class="hero-art">🎯</div>
+        </section>
+
+        <section class="stats-grid">
+            <article class="stat-card">
+                <span class="stat-icon">🎓</span>
+                <p>Education</p>
+                <h3>B.Tech CSE</h3>
+                <small>Your academic journey</small>
+            </article>
+            <article class="stat-card">
+                <span class="stat-icon">🧩</span>
+                <p>Skills Added</p>
+                <h3 id="skill-count">0 skills</h3>
+                <small>Build your skill profile</small>
+            </article>
+            <article class="stat-card">
+                <span class="stat-icon">📨</span>
+                <p>Applications</p>
+                <h3 id="application-count">0</h3>
+                <small>Internships you're tracking</small>
+            </article>
+        </section>
+
+        <section class="content-grid">
+            <article class="panel" id="profile">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">GET TO KNOW YOU</p>
+                        <h2>My Career Profile</h2>
+                    </div>
+                    <span class="panel-icon">👤</span>
+                </div>
+
+                <form id="profile-form">
+                    <label for="student-name">Your name</label>
+                    <input id="student-name" type="text" placeholder="Enter your name" required>
+
+                    <label for="career-goal">Career goal</label>
+                    <select id="career-goal" required>
+                        <option value="">Choose your goal</option>
+                        <option value="Frontend Developer">Frontend Developer</option>
+                        <option value="Backend Developer">Backend Developer</option>
+                        <option value="Full Stack Developer">Full Stack Developer</option>
+                        <option value="AI/ML Engineer">AI/ML Engineer</option>
+                        <option value="Data Analyst">Data Analyst</option>
+                    </select>
+
+                    <label for="skills">Your skills (comma-separated)</label>
+                    <input id="skills" type="text" placeholder="HTML, CSS, JavaScript">
+
+                    <button type="submit" class="primary-button">Save My Profile</button>
+                </form>
+                <p id="profile-message" class="message" aria-live="polite"></p>
+            </article>
+
+            <article class="panel" id="skills">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">KNOW YOUR NEXT STEP</p>
+                        <h2>Skill Analysis</h2>
+                    </div>
+                    <span class="panel-icon">🧠</span>
+                </div>
+
+                <p class="muted">Compare your current skills with a basic checklist for your selected career goal.</p>
+                <button id="analyze-button" class="secondary-button">Analyze My Skills</button>
+                <div id="skill-results" class="results" aria-live="polite">
+                    Your skill analysis will appear here.
+                </div>
+            </article>
+
+            <article class="panel" id="roadmap">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">ONE STEP AT A TIME</p>
+                        <h2>Career Roadmap</h2>
+                    </div>
+                    <span class="panel-icon">🗺️</span>
+                </div>
+                <ol class="roadmap-list">
+                    <li><span>01</span><div><strong>Learn the fundamentals</strong><p>Build a strong foundation in your chosen field.</p></div></li>
+                    <li><span>02</span><div><strong>Build practical projects</strong><p>Turn your knowledge into working applications.</p></div></li>
+                    <li><span>03</span><div><strong>Prepare your portfolio</strong><p>Document your projects and upload them to GitHub.</p></div></li>
+                    <li><span>04</span><div><strong>Apply and practice</strong><p>Apply for relevant internships and prepare for interviews.</p></div></li>
+                </ol>
+            </article>
+
+            <article class="panel" id="internships">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">YOUR OPPORTUNITIES</p>
+                        <h2>Internship Tracker</h2>
+                    </div>
+                    <span class="panel-icon">💼</span>
+                </div>
+
+                <form id="internship-form">
+                    <label for="company">Company name</label>
+                    <input id="company" type="text" placeholder="e.g. Example Technologies" required>
+
+                    <label for="role">Job role</label>
+                    <input id="role" type="text" placeholder="e.g. Software Developer Intern" required>
+
+                    <label for="application-status">Application status</label>
+                    <select id="application-status">
+                        <option>Wishlist</option>
+                        <option>Applied</option>
+                        <option>Interview</option>
+                        <option>Offer</option>
+                        <option>Rejected</option>
+                    </select>
+
+                    <button type="submit" class="primary-button">+ Add Application</button>
+                </form>
+
+                <div id="internship-list" class="internship-list" aria-live="polite"></div>
+            </article>
+        </section>
+
+        <footer>
+            <p>Career Copilot © 2026 · Built to help you learn, build, and grow.</p>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
