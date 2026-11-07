@@ -1,6 +1,7 @@
 // LocalStorage se data load karo
 let internships = JSON.parse(localStorage.getItem("internships")) || [];
-let activeFilter = "All"; // Default filter
+let activeFilter = "All";
+let editingIndex = null; // Track karega ki kaunsa item edit ho raha hai
 
 function saveData() {
   localStorage.setItem("internships", JSON.stringify(internships));
@@ -21,7 +22,6 @@ function renderFilterButtons() {
   const listContainer = document.getElementById("internship-list");
   if (!listContainer) return;
 
-  // Pehle se bane hue filter container ko check karo ya naya banao
   let filterContainer = document.getElementById("status-filter-container");
   if (!filterContainer) {
     filterContainer = document.createElement("div");
@@ -70,7 +70,6 @@ function renderInternships() {
   
   listContainer.innerHTML = "";
 
-  // Filter ke hisab se data select karo
   const filteredList = activeFilter === "All" 
     ? internships 
     : internships.filter(item => item.status.toLowerCase() === activeFilter.toLowerCase());
@@ -82,7 +81,6 @@ function renderInternships() {
   }
 
   filteredList.forEach((internship) => {
-    // Original index dhoondo delete karne ke liye
     const originalIndex = internships.indexOf(internship);
 
     const item = document.createElement("div");
@@ -103,6 +101,45 @@ function renderInternships() {
       <span style="display: inline-block; margin-top: 6px; font-size: 11px; background: #007acc; color: #fff; padding: 3px 8px; border-radius: 4px;">Status: ${internship.status}</span>
     `;
 
+    // Buttons Container (Edit + Delete)
+    const btnContainer = document.createElement("div");
+    btnContainer.style.display = "flex";
+    btnContainer.style.gap = "8px";
+
+    // Edit Button
+    const editBtn = document.createElement("button");
+    editBtn.innerText = "Edit";
+    editBtn.style.background = "#ffaa00";
+    editBtn.style.color = "#000";
+    editBtn.style.border = "none";
+    editBtn.style.padding = "6px 12px";
+    editBtn.style.borderRadius = "4px";
+    editBtn.style.cursor = "pointer";
+    editBtn.style.fontWeight = "bold";
+
+    editBtn.addEventListener("click", function() {
+      const trackerSection = document.querySelector("article") || document.body;
+      const inputs = trackerSection.querySelectorAll("input");
+      const select = trackerSection.querySelector("select");
+
+      if (inputs.length >= 2) {
+        inputs[0].value = internship.company;
+        inputs[1].value = internship.role;
+      }
+      if (select) {
+        select.value = internship.status;
+      }
+
+      editingIndex = originalIndex; // Set index for editing
+
+      // Button ka text temporary change karke user ko batayein
+      const addBtn = Array.from(document.querySelectorAll("button")).find(el => el.innerText.includes("Add Application") || el.innerText.includes("Update"));
+      if (addBtn) {
+        addBtn.innerText = "Update Application";
+      }
+    });
+
+    // Delete Button
     const deleteBtn = document.createElement("button");
     deleteBtn.innerText = "Delete";
     deleteBtn.style.background = "#ff4d4d";
@@ -115,18 +152,22 @@ function renderInternships() {
     deleteBtn.addEventListener("click", function() {
       internships.splice(originalIndex, 1);
       saveData();
+      renderFilterButtons();
       renderInternships();
     });
 
+    btnContainer.appendChild(editBtn);
+    btnContainer.appendChild(deleteBtn);
+
     item.appendChild(details);
-    item.appendChild(deleteBtn);
+    item.appendChild(btnContainer);
     listContainer.appendChild(item);
   });
 
   updateDashboardStats();
 }
 
-// Button click par data add karne ka logic
+// Button click par Add ya Update karne ka logic
 document.addEventListener("DOMContentLoaded", () => {
   const addBtn = Array.from(document.querySelectorAll("button")).find(el => el.innerText.includes("Add Application"));
 
@@ -152,8 +193,16 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const newInternship = { company, role, status };
-      internships.push(newInternship);
+      if (editingIndex !== null) {
+        // Agar edit mode hai toh update karo
+        internships[editingIndex] = { company, role, status };
+        editingIndex = null;
+        addBtn.innerText = "+ Add Application";
+      } else {
+        // Naya add karo
+        const newInternship = { company, role, status };
+        internships.push(newInternship);
+      }
 
       saveData();
       renderFilterButtons();
