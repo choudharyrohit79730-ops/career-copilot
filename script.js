@@ -7,16 +7,14 @@ function saveData() {
 }
 
 // UI par internships render karne ka function
+let internshipList = null;
+
 function renderInternships() {
-  // Check karo ki list container kahan hai
-  let internshipList = document.getElementById("internship-list");
-  
-  // Agar HTML mein id nahi mili, toh container create ya find karo
   if (!internshipList) {
-    internshipList = document.querySelector(".internship-list") || document.querySelector("#internships-list");
+    internshipList = document.getElementById("internship-list") || document.querySelector(".internship-list") || document.querySelector("#internships-list");
   }
 
-  // Agar phir bhi list container nahi mila, toh form ke neeche khud ek div bana do
+  // Agar list container nahi mila, toh form ke neeche khud bana do
   const formElem = document.querySelector("form") || document.getElementById("internship-form");
   if (formElem && !document.getElementById("dynamic-internship-list")) {
     const listContainer = document.createElement("div");
@@ -31,7 +29,7 @@ function renderInternships() {
   internshipList.innerHTML = "";
 
   if (internships.length === 0) {
-    internshipList.innerHTML = `<p style="color: #aaa; font-size: 14px; text-align: center; margin-top: 10px;">No internships tracked yet. Add one above!</p>`;
+    internshipList.innerHTML = `<p style="color: #aaa; font-size: 14px; text-align: center; margin-top: 10px;">No internships tracked yet.</p>`;
     return;
   }
 
@@ -75,23 +73,28 @@ function renderInternships() {
   });
 }
 
-// Form Submission Event Listener
+// Add button click logic (No Page Refresh / No Jump)
 document.addEventListener("DOMContentLoaded", () => {
   const internshipForm = document.querySelector("form") || document.getElementById("internship-form");
+  const addBtn = document.querySelector("button[type='submit']") || document.querySelector("#add-btn") || (internshipForm ? internshipForm.querySelector("button") : null);
 
   if (internshipForm) {
-    internshipForm.addEventListener("submit", function(event) {
-      // Page ko upar jump hone se rokne ke liye sabse zaroori:
-      event.preventDefault();
+    internshipForm.addEventListener("submit", function(e) {
+      e.preventDefault(); // Form reload rokne ke liye
+    });
+  }
 
-      const inputs = internshipForm.querySelectorAll("input");
-      const select = internshipForm.querySelector("select");
+  if (addBtn) {
+    addBtn.addEventListener("click", function(event) {
+      event.preventDefault(); // Page upar jaane se rokne ke liye
+
+      const inputs = internshipForm ? internshipForm.querySelectorAll("input") : document.querySelectorAll("input");
+      const select = internshipForm ? internshipForm.querySelector("select") : document.querySelector("select");
 
       let company = inputs[0] ? inputs[0].value.trim() : "";
       let role = inputs[1] ? inputs[1].value.trim() : "";
       let status = select ? select.value : "Wishlist";
 
-      // Fallback inputs check agar placeholder se uthana pade
       inputs.forEach(input => {
         if (input.placeholder && input.placeholder.toLowerCase().includes("company")) {
           company = input.value.trim();
@@ -112,8 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
       saveData();
       renderInternships();
 
-      // Form reset karo taaki fields khali ho jayein bina page refresh kiye
-      internshipForm.reset();
+      if (internshipForm) internshipForm.reset();
     });
   }
 
