@@ -3,17 +3,29 @@ let internships = JSON.parse(localStorage.getItem("internships")) || [];
 
 function saveData() {
   localStorage.setItem("internships", JSON.stringify(internships));
+  updateDashboardStats();
+}
+
+// Dashboard par count update karne ka function (HTML ke application-count ID ke sath matched)
+function updateDashboardStats() {
+  const totalCountElem = document.getElementById("application-count") || document.getElementById("total-applications") || document.querySelector(".applications-count");
+  
+  const total = internships.length;
+
+  if (totalCountElem) {
+    totalCountElem.innerText = total;
+  }
 }
 
 function renderInternships() {
   let listContainer = document.getElementById("internship-list");
-  
   if (!listContainer) return;
   
   listContainer.innerHTML = "";
 
   if (internships.length === 0) {
     listContainer.innerHTML = `<p style="color: #aaa; font-size: 14px; text-align: center; margin-top: 10px;">No internships tracked yet.</p>`;
+    updateDashboardStats();
     return;
   }
 
@@ -55,13 +67,14 @@ function renderInternships() {
     item.appendChild(deleteBtn);
     listContainer.appendChild(item);
   });
+
+  updateDashboardStats();
 }
 
-// Button click par data add karne ka foolproof logic
+// Button click par data add karne ka logic
 document.addEventListener("DOMContentLoaded", () => {
-  // "+ Add Application" text wale button ko directly dhoondo
   const addBtn = Array.from(document.querySelectorAll("button")).find(el => el.innerText.includes("Add Application"));
-  
+
   const companyInput = document.getElementById("company");
   const roleInput = document.getElementById("role");
   const statusSelect = document.getElementById("application-status");
@@ -70,9 +83,18 @@ document.addEventListener("DOMContentLoaded", () => {
     addBtn.addEventListener("click", function(e) {
       e.preventDefault();
 
-      const company = companyInput ? companyInput.value.trim() : "";
-      const role = roleInput ? roleInput.value.trim() : "";
-      const status = statusSelect ? statusSelect.value : "Wishlist";
+      const trackerSection = addBtn.closest("article") || addBtn.parentElement;
+      const inputs = trackerSection ? trackerSection.querySelectorAll("input") : document.querySelectorAll("input");
+      const select = trackerSection ? trackerSection.querySelector("select") : document.querySelector("select");
+
+      let company = "";
+      let role = "";
+      let status = select ? select.value : "Wishlist";
+
+      if (inputs.length >= 2) {
+        company = inputs[0].value.trim();
+        role = inputs[1].value.trim();
+      }
 
       if (!company || !role) {
         alert("Please fill in both Company name and Job role!");
@@ -85,9 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
       saveData();
       renderInternships();
 
-      // Inputs clear kar do
-      if (companyInput) companyInput.value = "";
-      if (roleInput) roleInput.value = "";
+      if (inputs[0]) inputs[0].value = "";
+      if (inputs[1]) inputs[1].value = "";
     });
   }
 
