@@ -1,26 +1,39 @@
-// LocalStorage se data load karo ya empty array rakho
+// LocalStorage se data load karo
 let internships = JSON.parse(localStorage.getItem("internships")) || [];
 
 // Data save karne ka function
 function saveData() {
   localStorage.setItem("internships", JSON.stringify(internships));
-  updateStats();
-}
-
-// Dashboard stats update karne ka function
-function updateStats() {
-  const totalAppsElem = document.getElementById("total-applications") || document.querySelector(".applications-count");
-  if (totalAppsElem) {
-    totalAppsElem.innerText = internships.length;
-  }
 }
 
 // UI par internships render karne ka function
 function renderInternships() {
-  const internshipList = document.getElementById("internship-list") || document.querySelector("#internship-list");
+  // Check karo ki list container kahan hai
+  let internshipList = document.getElementById("internship-list");
+  
+  // Agar HTML mein id nahi mili, toh container create ya find karo
+  if (!internshipList) {
+    internshipList = document.querySelector(".internship-list") || document.querySelector("#internships-list");
+  }
+
+  // Agar phir bhi list container nahi mila, toh form ke neeche khud ek div bana do
+  const formElem = document.querySelector("form") || document.getElementById("internship-form");
+  if (formElem && !document.getElementById("dynamic-internship-list")) {
+    const listContainer = document.createElement("div");
+    listContainer.id = "dynamic-internship-list";
+    listContainer.style.marginTop = "20px";
+    formElem.parentNode.appendChild(listContainer);
+    internshipList = listContainer;
+  }
+
   if (!internshipList) return;
   
   internshipList.innerHTML = "";
+
+  if (internships.length === 0) {
+    internshipList.innerHTML = `<p style="color: #aaa; font-size: 14px; text-align: center; margin-top: 10px;">No internships tracked yet. Add one above!</p>`;
+    return;
+  }
 
   internships.forEach((internship, index) => {
     const item = document.createElement("div");
@@ -35,11 +48,10 @@ function renderInternships() {
     item.style.background = "#1a1a1a";
 
     const details = document.createElement("div");
-    // Yahan company name explicitly print karwa diya hai
     details.innerHTML = `
-      <h4 style="margin: 0 0 4px 0; color: #fff; font-size: 16px;">🏢 Company: ${internship.company || 'N/A'}</h4>
-      <p style="margin: 2px 0; color: #ccc; font-size: 14px;">Role: ${internship.role || 'N/A'}</p>
-      <span style="display: inline-block; margin-top: 6px; font-size: 11px; background: #007acc; color: #fff; padding: 3px 8px; border-radius: 4px;">Status: ${internship.status || 'Wishlist'}</span>
+      <h4 style="margin: 0 0 4px 0; color: #fff; font-size: 16px;">🏢 Company: ${internship.company}</h4>
+      <p style="margin: 2px 0; color: #ccc; font-size: 14px;">Role: ${internship.role}</p>
+      <span style="display: inline-block; margin-top: 6px; font-size: 11px; background: #007acc; color: #fff; padding: 3px 8px; border-radius: 4px;">Status: ${internship.status}</span>
     `;
 
     const deleteBtn = document.createElement("button");
@@ -61,8 +73,6 @@ function renderInternships() {
     item.appendChild(deleteBtn);
     internshipList.appendChild(item);
   });
-
-  updateStats();
 }
 
 // Form Submission Event Listener
@@ -71,18 +81,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (internshipForm) {
     internshipForm.addEventListener("submit", function(event) {
+      // Page ko upar jump hone se rokne ke liye sabse zaroori:
       event.preventDefault();
 
-      // Form ke saare input fields ko pakdo
       const inputs = internshipForm.querySelectorAll("input");
       const select = internshipForm.querySelector("select");
 
-      // Pehla input Company name aur dusra Job role ke liye fix kiya
       let company = inputs[0] ? inputs[0].value.trim() : "";
       let role = inputs[1] ? inputs[1].value.trim() : "";
       let status = select ? select.value : "Wishlist";
 
-      // Agar pehla input khali hai toh placeholder ya type se dhoondo
+      // Fallback inputs check agar placeholder se uthana pade
       inputs.forEach(input => {
         if (input.placeholder && input.placeholder.toLowerCase().includes("company")) {
           company = input.value.trim();
@@ -92,8 +101,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      if (!company) company = "Target Company";
-      if (!role) role = "Developer Intern";
+      if (!company || !role) {
+        alert("Please fill in both Company name and Job role!");
+        return;
+      }
 
       const newInternship = { company, role, status };
       internships.push(newInternship);
@@ -101,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
       saveData();
       renderInternships();
 
+      // Form reset karo taaki fields khali ho jayein bina page refresh kiye
       internshipForm.reset();
     });
   }
