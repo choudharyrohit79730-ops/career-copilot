@@ -1,20 +1,67 @@
 // LocalStorage se data load karo
 let internships = JSON.parse(localStorage.getItem("internships")) || [];
+let activeFilter = "All"; // Default filter
 
 function saveData() {
   localStorage.setItem("internships", JSON.stringify(internships));
   updateDashboardStats();
 }
 
-// Dashboard par count update karne ka function (HTML ke application-count ID ke sath matched)
+// Dashboard par count update karne ka function
 function updateDashboardStats() {
   const totalCountElem = document.getElementById("application-count") || document.getElementById("total-applications") || document.querySelector(".applications-count");
-  
   const total = internships.length;
-
   if (totalCountElem) {
     totalCountElem.innerText = total;
   }
+}
+
+// Filter Buttons Render Karne Ka Function
+function renderFilterButtons() {
+  const listContainer = document.getElementById("internship-list");
+  if (!listContainer) return;
+
+  // Pehle se bane hue filter container ko check karo ya naya banao
+  let filterContainer = document.getElementById("status-filter-container");
+  if (!filterContainer) {
+    filterContainer = document.createElement("div");
+    filterContainer.id = "status-filter-container";
+    filterContainer.style.marginBottom = "15px";
+    filterContainer.style.display = "flex";
+    filterContainer.style.gap = "8px";
+    filterContainer.style.flexWrap = "wrap";
+    listContainer.parentNode.insertBefore(filterContainer, listContainer);
+  }
+
+  const statuses = ["All", "Wishlist", "Applied", "Interview", "Offer", "Rejected"];
+  filterContainer.innerHTML = "";
+
+  statuses.forEach(status => {
+    const btn = document.createElement("button");
+    btn.innerText = status;
+    btn.style.padding = "6px 12px";
+    btn.style.borderRadius = "20px";
+    btn.style.border = "1px solid #007acc";
+    btn.style.cursor = "pointer";
+    btn.style.fontSize = "13px";
+    btn.style.transition = "0.2s";
+
+    if (activeFilter === status) {
+      btn.style.background = "#007acc";
+      btn.style.color = "#fff";
+    } else {
+      btn.style.background = "transparent";
+      btn.style.color = "#ccc";
+    }
+
+    btn.addEventListener("click", () => {
+      activeFilter = status;
+      renderFilterButtons();
+      renderInternships();
+    });
+
+    filterContainer.appendChild(btn);
+  });
 }
 
 function renderInternships() {
@@ -23,13 +70,21 @@ function renderInternships() {
   
   listContainer.innerHTML = "";
 
-  if (internships.length === 0) {
-    listContainer.innerHTML = `<p style="color: #aaa; font-size: 14px; text-align: center; margin-top: 10px;">No internships tracked yet.</p>`;
+  // Filter ke hisab se data select karo
+  const filteredList = activeFilter === "All" 
+    ? internships 
+    : internships.filter(item => item.status.toLowerCase() === activeFilter.toLowerCase());
+
+  if (filteredList.length === 0) {
+    listContainer.innerHTML = `<p style="color: #aaa; font-size: 14px; text-align: center; margin-top: 15px;">No applications found in '${activeFilter}'.</p>`;
     updateDashboardStats();
     return;
   }
 
-  internships.forEach((internship, index) => {
+  filteredList.forEach((internship) => {
+    // Original index dhoondo delete karne ke liye
+    const originalIndex = internships.indexOf(internship);
+
     const item = document.createElement("div");
     item.className = "internship-card";
     item.style.border = "1px solid #444";
@@ -58,7 +113,7 @@ function renderInternships() {
     deleteBtn.style.cursor = "pointer";
 
     deleteBtn.addEventListener("click", function() {
-      internships.splice(index, 1);
+      internships.splice(originalIndex, 1);
       saveData();
       renderInternships();
     });
@@ -74,10 +129,6 @@ function renderInternships() {
 // Button click par data add karne ka logic
 document.addEventListener("DOMContentLoaded", () => {
   const addBtn = Array.from(document.querySelectorAll("button")).find(el => el.innerText.includes("Add Application"));
-
-  const companyInput = document.getElementById("company");
-  const roleInput = document.getElementById("role");
-  const statusSelect = document.getElementById("application-status");
 
   if (addBtn) {
     addBtn.addEventListener("click", function(e) {
@@ -105,6 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
       internships.push(newInternship);
 
       saveData();
+      renderFilterButtons();
       renderInternships();
 
       if (inputs[0]) inputs[0].value = "";
@@ -112,5 +164,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  renderFilterButtons();
   renderInternships();
 });
