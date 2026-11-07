@@ -57,17 +57,19 @@ function renderInternships() {
   });
 }
 
-// Button click par data add karne ka logic
+// Button click par data add karne ka foolproof logic
 document.addEventListener("DOMContentLoaded", () => {
-  const addBtn = document.querySelector(".primary-button");
+  // "+ Add Application" text wale button ko directly dhoondo
+  const addBtn = Array.from(document.querySelectorAll("button")).find(el => el.innerText.includes("Add Application"));
   
-  // Input fields directly IDs se utha lo jo HTML mein hain
   const companyInput = document.getElementById("company");
   const roleInput = document.getElementById("role");
   const statusSelect = document.getElementById("application-status");
 
   if (addBtn) {
-    addBtn.addEventListener("click", function() {
+    addBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+
       const company = companyInput ? companyInput.value.trim() : "";
       const role = roleInput ? roleInput.value.trim() : "";
       const status = statusSelect ? statusSelect.value : "Wishlist";
