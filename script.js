@@ -6,17 +6,23 @@ function saveData() {
 }
 
 function renderInternships() {
-  const internshipList = document.getElementById("internship-list") || document.querySelector(".internship-list");
-  if (!internshipList) return;
+  let listContainer = document.getElementById("internship-list");
   
-  internshipList.innerHTML = "";
+  if (!listContainer) return;
+  
+  listContainer.innerHTML = "";
+
+  if (internships.length === 0) {
+    listContainer.innerHTML = `<p style="color: #aaa; font-size: 14px; text-align: center; margin-top: 10px;">No internships tracked yet.</p>`;
+    return;
+  }
 
   internships.forEach((internship, index) => {
     const item = document.createElement("div");
     item.className = "internship-card";
     item.style.border = "1px solid #444";
-    item.style.padding = "12px";
-    item.style.marginBottom = "10px";
+    item.style.padding = "14px";
+    item.style.marginBottom = "12px";
     item.style.borderRadius = "8px";
     item.style.display = "flex";
     item.style.justifyContent = "space-between";
@@ -25,9 +31,9 @@ function renderInternships() {
 
     const details = document.createElement("div");
     details.innerHTML = `
-      <h4 style="margin: 0 0 4px 0; color: #fff; font-size: 15px;">🏢 Company: ${internship.company}</h4>
-      <p style="margin: 2px 0; color: #ccc; font-size: 13px;">Role: ${internship.role}</p>
-      <span style="display: inline-block; margin-top: 6px; font-size: 11px; background: #007acc; color: #fff; padding: 2px 8px; border-radius: 4px;">Status: ${internship.status}</span>
+      <h4 style="margin: 0 0 4px 0; color: #fff; font-size: 16px;">🏢 Company: ${internship.company}</h4>
+      <p style="margin: 2px 0; color: #ccc; font-size: 14px;">Role: ${internship.role}</p>
+      <span style="display: inline-block; margin-top: 6px; font-size: 11px; background: #007acc; color: #fff; padding: 3px 8px; border-radius: 4px;">Status: ${internship.status}</span>
     `;
 
     const deleteBtn = document.createElement("button");
@@ -47,38 +53,39 @@ function renderInternships() {
 
     item.appendChild(details);
     item.appendChild(deleteBtn);
-    internshipList.appendChild(item);
+    listContainer.appendChild(item);
   });
 }
 
+// Button click par data add karne ka logic
 document.addEventListener("DOMContentLoaded", () => {
-  const internshipForm = document.querySelector("form") || document.getElementById("internship-form");
+  const addBtn = document.querySelector(".primary-button");
+  
+  // Input fields directly IDs se utha lo jo HTML mein hain
+  const companyInput = document.getElementById("company");
+  const roleInput = document.getElementById("role");
+  const statusSelect = document.getElementById("application-status");
 
-  if (internshipForm) {
-    // Sabhi buttons par rok laga do taaki page upar jump na kare
-    const buttons = internshipForm.querySelectorAll("button");
-    buttons.forEach(btn => {
-      btn.type = "button"; // Isse form submit hone ki bimaari khatam ho jayegi
-      btn.addEventListener("click", function(e) {
-        e.preventDefault();
+  if (addBtn) {
+    addBtn.addEventListener("click", function() {
+      const company = companyInput ? companyInput.value.trim() : "";
+      const role = roleInput ? roleInput.value.trim() : "";
+      const status = statusSelect ? statusSelect.value : "Wishlist";
 
-        const inputs = internshipForm.querySelectorAll("input");
-        const select = internshipForm.querySelector("select");
+      if (!company || !role) {
+        alert("Please fill in both Company name and Job role!");
+        return;
+      }
 
-        let company = inputs[0] ? inputs[0].value.trim() : "";
-        let role = inputs[1] ? inputs[1].value.trim() : "";
-        let status = select ? select.value : "Wishlist";
+      const newInternship = { company, role, status };
+      internships.push(newInternship);
 
-        if (!company || !role) {
-          alert("Please fill Company name and Role!");
-          return;
-        }
+      saveData();
+      renderInternships();
 
-        internships.push({ company, role, status });
-        saveData();
-        renderInternships();
-        internshipForm.reset();
-      });
+      // Inputs clear kar do
+      if (companyInput) companyInput.value = "";
+      if (roleInput) roleInput.value = "";
     });
   }
 
